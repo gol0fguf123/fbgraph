@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Fbgraph : Facebook Open Graph API in Ruby" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Fbgraph</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/gol0fguf123/fbgraph">View on GitHub</a>
+
+          <h1 id="project_title">Fbgraph</h1>
+          <h2 id="project_tagline">Facebook Open Graph API in Ruby</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/gol0fguf123/fbgraph/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/gol0fguf123/fbgraph/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>h2. FBGRaph</p>
+
+<p>p. Facebook Open Graph API Gem for Rails 3.</p>
+
+<p>h2. Resources</p>
+
+<ul>
+<li><p>"View RDoc on RDoc.info":<a href="http://rdoc.info/projects/nsanta/fbgraph">http://rdoc.info/projects/nsanta/fbgraph</a></p></li>
+<li><p>"View Source on GitHub":<a href="http://github.com/nsanta/fbgraph">http://github.com/nsanta/fbgraph</a></p></li>
+<li><p>"Report Issues on GitHub":<a href="http://github.com/nsanta/fbgraph/issues">http://github.com/nsanta/fbgraph/issues</a></p></li>
+</ul><p>h2. Installation</p>
+
+<p>notextile. <code> gem install fbgraph</code></p>
+
+<p>p. Be sure to require it</p>
+
+<p>notextile. <code>require "fbgraph"</code></p>
+
+<p>p. or add this line into Gemfile for Rails 3</p>
+
+<p>notextile. <code>gem "fbgraph"</code></p>
+
+<p>h2. Example Apps</p>
+
+<p>"Rails 3 Example":<a href="http://github.com/nsanta/fbgraph_example">http://github.com/nsanta/fbgraph_example</a></p>
+
+<p>h2. Usage</p>
+
+<p>p. FBGraph supports most (no analytics yet) features of Facebook Open Graph API: developers.facebook.com/docs/reference/api/</p>
+
+<p><strong>IMPORTANT!!</strong>  Facebook object IDs can be very large numbers--too large to fit in a regular SQL "INTEGER" column.  If you use an integer column, your database will likely just store the largest number allowed resulting in a bug that may confound you beyond belief.</p>
+
+<p><strong>IF YOU PLAN TO STORE FACEBOOK GRAPH OBJECT IDS IN YOUR DATABASE, YOU MUST USE A BIGINT COLUMN, NOT A STANDARD INTEGER COLUMN!</strong></p>
+
+<p>h3. Initialization</p>
+
+<p>p. Without a token (for authorization)</p>
+
+<p>notextile. <code>client = FBGraph::Client.new(:client_id =&gt; 'client_id',:secret_id =&gt;'secret_id')</code></p>
+
+<p>p. With a token</p>
+
+<p>notextile. <code>client = FBGraph::Client.new(:client_id =&gt; 'client_id',:secret_id =&gt;'secret_id' ,:token =&gt; token)</code></p>
+
+<p>p. All methods are chainable</p>
+
+<p>Examples:</p>
+
+<p>notextile. <code>client.selection.me.photos.until(Time.now.to_s).since(3.days.ago).limit(10).info!</code></p>
+
+<p>notextile. <code>client.selection.user('id').videos.offset(10).info!</code></p>
+
+<p>notextile. <code>client.search.query('q').on('users').limit(20).info!</code></p>
+
+<p>h3. Rails config file</p>
+
+<p>h2. TODO</p>
+
+<p>h3. Authorization</p>
+
+<p>h4. client.authorization.authorize_url</p>
+
+<p>p. returns the authorize url</p>
+
+<p>notextile. <code> redirect_to client.authorization.authorize_url(:redirect_uri =&gt; callback_url , :scope =&gt; 'email,user_photos,friends_photos')</code></p>
+
+<p>h4. client.authorization.process_callback</p>
+
+<p>p. process the callback and returns the access token</p>
+
+<p>notextile. <code> access_token = client.authorization.process_callback(params[:code], :redirect_uri =&gt; callback_url)</code></p>
+
+<p>h3. Exchange Sessions</p>
+
+<p>h2. TODO</p>
+
+<p>h3. Canvas</p>
+
+<p>Facebook send a signed_request as a parameter. Can be decoded with the method parse_signed_request of FBGraph::Canvas module</p>
+
+<blockquote>
+<p>FBGraph::Canvas.parse_signed_request(app_secret, params[:signed_request])</p>
+</blockquote>
+
+<p>h3. Selection</p>
+
+<p>h4. Accessing objects with connection types.</p>
+
+<p>p. All objects and their connections can be accesed</p>
+
+<p>Examples:</p>
+
+<p>notextile. <code> client.selection.me.home.info!</code></p>
+
+<p>notextile. <code> client.selection.user('id').photos.info!</code></p>
+
+<p>notextile. <code> client.selection.photo('id').comments.info!</code></p>
+
+<p>notextile. <code> client.selection.page('id').info!</code></p>
+
+<p>p. Also you can get results of more than 1 objects</p>
+
+<p>Example:</p>
+
+<p>notextile. <code> client.selection.user([id1,id2,id3]).info!</code></p>
+
+<p>h4. client.selection.info!</p>
+
+<p>p. request with GET for information and return the response parsed with JSON. You can disable the parsing passing false as a first and unique parameter</p>
+
+<p>notextile. <code> user_info = client.selection.me.info! </code></p>
+
+<p>h3. Publishing</p>
+
+<p>h4. client.selection.publish!</p>
+
+<p>p. request with POST for publishing and return the response parsed with JSON. You can disable the parsing passing false as a first and unique parameter</p>
+
+<p>notextile. <code> client.selection.post('id').comments.params(:message =&gt; 'comment test').publish! </code></p>
+
+<p>p. OR</p>
+
+<p>notextile. <code> client.selection.post('id').comments.publish!(:message =&gt; 'comment test') </code></p>
+
+<p>h3. Deletion</p>
+
+<p>h4. client.selection.delete!</p>
+
+<p>p. request with DELETE for deletion and return the response parsed with JSON. You can disable the parsing passing false as a first and unique parameter</p>
+
+<p>notextile. <code> client.selection.post('id').delete!</code></p>
+
+<p>h3. Picture</p>
+
+<p>h4. client.selection.picture</p>
+
+<p>p. return the url of the object picture</p>
+
+<p>notextile. <code> client.selection.me.picture </code></p>
+
+<p>h3. Paging</p>
+
+<p>h4. client.selection.limit</p>
+
+<p>notextile. <code> client.selection.me.photos.limit(3).info! </code></p>
+
+<p>h4. client.selection.offset</p>
+
+<p>notextile. <code> client.selection.me.photos.offset(10).info! </code></p>
+
+<p>h4. client.selection.until</p>
+
+<p>notextile. <code> client.selection.me.photos.until(Time.now.to_s).info! </code></p>
+
+<p>h4. client.selection.since</p>
+
+<p>notextile. <code> client.selection.me.photos.since(3.days.ago).info! </code></p>
+
+<p>h3. Search</p>
+
+<p>h4. client.search.query('query').info!</p>
+
+<p>p.  Get the search results </p>
+
+<p>notextile. <code> results = client.search.query('facebook').info! </code></p>
+
+<p>h4. client.search.query('query')on('type').info!</p>
+
+<p>p.  Get the search results by type</p>
+
+<p>notextile. <code> results = client.search.query('facebook').on('home').info! </code></p>
+
+<p>h3. RealTime Updates</p>
+
+<p>h4. client.realtime.user</p>
+
+<p>h4. client.realtime.permissions</p>
+
+<p>h4. client.realtime.errors</p>
+
+<p>p. Set the object to be subscribed, modified or unsubscribed</p>
+
+<p>h4. client.realtime.fields('email,picture')</p>
+
+<p>p. Set the objects fields </p>
+
+<p>h4. client.realtime.callback_url(url)</p>
+
+<p>p. Set the callback url</p>
+
+<p>h4. client.realtime.verify_token(token)</p>
+
+<p>p. Set the verify token (optional)</p>
+
+<p>h4. client.realtime.subscribe!</p>
+
+<p>p. Send the request for add/modify a subscription for realtime Updates.</p>
+
+<p>Examples:</p>
+
+<p>notextile. <code> results = client.realtime.user.fields('email,picture').callback_url(url).verify_token('token').subscribe! </code></p>
+
+<p>notextile. <code> results = client.realtime.permissions.fields('read_stream').callback_url(url).subscribe! </code></p>
+
+<p>If you want delete a subscirpition, you can use the delete! method.</p>
+
+<p>Examples:</p>
+
+<p>notextile. <code> results = client.realtime.user.delete!</code></p>
+
+<p>h3. FQL</p>
+
+<p>h4. client.fql.query("SELECT name FROM user WHERE uid = me()")</p>
+
+<p>h3. Timeline</p>
+
+<p>h4. client.timeline.action('namespace', 'run').param(:location =&gt; [location object URL])</p>
+
+<p>h4. client.timeline.reads.param(:article =&gt; [article object URL] )</p>
+
+<p>h3. Analytics</p>
+
+<p>h4. TODO</p>
+
+<p>h3. Advanced</p>
+
+<p>h4. not documented yet</p>
+
+<p>h2. Credits</p>
+
+<p>Examples:</p>
+
+<p>notextile. <code> results = client.selection.user(USER_ID).payments.info!(:status =&gt; STATUS). </code></p>
+
+<p>notextile. <code> results = client.selection.order(ORDER_ID).publish!(:status =&gt; STATUS) </code>  </p>
+
+<p>h2. Contributions</p>
+
+<p>p. Just do a pull request with the repo in sync.</p>
+
+<p>h2. Maintainers</p>
+
+<p>"Nicolas Santa":<a href="http://github.com/nsanta">http://github.com/nsanta</a></p>
+
+<p>"Matt Lightner (via RedRadiant)":<a href="http://github.com/redradiant">http://github.com/redradiant</a></p>
+
+<p>"Victor Costan":<a href="http://github.com/pwnall">http://github.com/pwnall</a></p>
+
+<p>h2. Contributors List</p>
+
+<p>"Mark Bates":<a href="http://github.com/markbates">http://github.com/markbates</a></p>
+
+<p>"Florent Guilleux":<a href="http://github.com/Florent2">http://github.com/Florent2</a></p>
+
+<p>"Jan De Poorter":<a href="http://github.com/DefV">http://github.com/DefV</a></p>
+
+<p>"Thilo-Alexander Ginkel":<a href="http://github.com/ginkel">http://github.com/ginkel</a></p>
+
+<p>"Matias Käkelä":<a href="http://github.com/massive">http://github.com/massive</a></p>
+
+<p>"Max De Marzi":<a href="http://github.com/maxdemarzi">http://github.com/maxdemarzi</a></p>
+
+<p>"Peter Boling":<a href="https://github.com/pboling">https://github.com/pboling</a></p>
+
+<p>"Roberto Miranda":<a href="https://github.com/robertomiranda">https://github.com/robertomiranda</a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Fbgraph maintained by <a href="https://github.com/gol0fguf123">gol0fguf123</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
